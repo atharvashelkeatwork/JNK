@@ -1,0 +1,3 @@
+io.github.atharvashelkeatwork.jnativekit.providers.linux.LinuxNotifySendNotificationsProvider
+io.github.atharvashelkeatwork.jnativekit.providers.windows.WindowsAwtNotificationsProvider
+io.github.atharvashelkeatwork.jnativekit.providers.macos.MacOsascriptNotificationsProvider

@@ -1,0 +1,53 @@
+name: Feature request
+description: Propose a change that fits the documented scope.
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        jnativekit deliberately keeps a small scope. Read [docs/SCOPE.md](../docs/SCOPE.md) and
+        [docs/MILESTONES.md](../docs/MILESTONES.md) first: credential storage, global hotkeys,
+        rich notifications and Maven Central are already planned for later versions.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you unable to do today, on which OS and desktop?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API or behaviour
+      description: Show the call you wish you could write, and what status/reason it should return.
+      render: java
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing libraries or workarounds you tried.
+    validations:
+      required: false
+  - type: dropdown
+    id: version
+    attributes:
+      label: Target version
+      options:
+        - v0.1 (current)
+        - v0.2 (credential storage)
+        - v0.3 (global hotkeys)
+        - later / unsure
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This request does not require a new runtime dependency in core or providers.
+          required: true
+        - label: This request can report an honest capability and result like the existing features.
+          required: true

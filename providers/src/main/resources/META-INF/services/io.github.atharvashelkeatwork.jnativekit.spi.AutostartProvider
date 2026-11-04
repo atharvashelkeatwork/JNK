@@ -1,0 +1,3 @@
+io.github.atharvashelkeatwork.jnativekit.providers.linux.LinuxDesktopEntryAutostartProvider
+io.github.atharvashelkeatwork.jnativekit.providers.windows.WindowsRegAutostartProvider
+io.github.atharvashelkeatwork.jnativekit.providers.macos.MacLaunchAgentAutostartProvider

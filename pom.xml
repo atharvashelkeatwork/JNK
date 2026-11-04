@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.github.atharvashelkeatwork</groupId>
+  <artifactId>jnativekit-parent</artifactId>
+  <version>0.1.0</version>
+  <packaging>pom</packaging>
+
+  <name>jnativekit</name>
+  <description>One honest API for desktop notifications, autostart and system tray on Linux, Windows and macOS.</description>
+  <url>https://github.com/atharvashelkeatwork/jnativekit</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>atharvashelkeatwork</id>
+      <name>Atharva Shelke</name>
+      <url>https://github.com/atharvashelkeatwork</url>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>core</module>
+    <module>providers</module>
+    <module>demo</module>
+  </modules>
+
+  <scm>
+    <connection>scm:git:https://github.com/atharvashelkeatwork/jnativekit.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/atharvashelkeatwork/jnativekit.git</developerConnection>
+    <url>https://github.com/atharvashelkeatwork/jnativekit</url>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/atharvashelkeatwork/jnativekit/issues</url>
+  </issueManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+    <junit.version>5.14.4</junit.version>
+    <!-- Default build excludes tests tagged "integration"; the integration profile blanks this. -->
+    <excludedGroups>integration</excludedGroups>
+    <!-- Set to true for a local Central bundle dry run; see docs/RELEASING.md. -->
+    <central.skipUpload>false</central.skipUpload>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <!-- Declared here so every module has it; only the demo turns it on. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.6.4</version>
+        <configuration>
+          <!-- Only the demo enables this. The placeholder satisfies parameter validation. -->
+          <skip>true</skip>
+          <mainClass>java.lang.Object</mainClass>
+        </configuration>
+      </plugin>
+      <!-- Published modules ship a Javadoc jar; the demo skips it. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.12.0</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doclint>all</doclint>
+        </configuration>
+      </plugin>
+      <!-- Central requires a sources jar next to every published jar. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.16.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.6.1</version>
+          <configuration>
+            <excludedGroups>${excludedGroups}</excludedGroups>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.5.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>integration</id>
+      <properties>
+        <!-- Empty value: surefire sees no excluded groups, so @Tag("integration") tests run. -->
+        <excludedGroups></excludedGroups>
+      </properties>
+    </profile>
+    <!--
+      Maven Central publication through the Central Portal. Active only when asked for, so the
+      default build needs no signing key, credentials or network access to Central. See
+      docs/RELEASING.md.
+    -->
+    <profile>
+      <id>central</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.8</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+              <passphrase>${env.MAVEN_GPG_PASSPHRASE}</passphrase>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.12.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <!-- The owner reviews the validated deployment in the Portal before publishing. -->
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>false</autoPublish>
+              <waitUntil>validated</waitUntil>
+              <skipUpload>${central.skipUpload}</skipUpload>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

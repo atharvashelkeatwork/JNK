@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to Maven Central
+    runs-on: ubuntu-latest
+    environment: release
+    timeout-minutes: 60
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 17 and Central credentials
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          server-id: central
+          server-username: CENTRAL_USERNAME
+          server-password: CENTRAL_PASSWORD
+
+      - name: Check that the tag matches the project version
+        run: |
+          set -euo pipefail
+          version="$(mvn -B -q help:evaluate -Dexpression=project.version -DforceStdout)"
+          expected="v${version}"
+          if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match the project version ${expected}." >&2
+            echo "Bump the version before tagging, or tag the matching commit." >&2
+            exit 1
+          fi
+
+      - name: Import the GPG signing key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          export GNUPGHOME="$(mktemp -d)"
+          echo "GNUPGHOME=${GNUPGHOME}" >> "${GITHUB_ENV}"
+          printf '%s' "${GPG_PRIVATE_KEY}" | gpg --batch --import
+
+      - name: Verify every test tier
+        run: mvn -B verify -Pintegration
+
+      - name: Deploy to the Central Portal
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+        run: mvn -B -Pcentral deploy

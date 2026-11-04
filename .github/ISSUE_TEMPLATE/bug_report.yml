@@ -1,0 +1,88 @@
+name: Bug report
+description: Report a feature that failed, misreported its state, or crashed.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not use this form for security problems. See [SECURITY.md](../SECURITY.md).
+        Before filing, run the demo with `--report` and keep its output: it names the detected
+        platform and the capability of each feature.
+  - type: input
+    id: version
+    attributes:
+      label: jnativekit version
+      description: The version or commit you built from.
+      placeholder: "0.1.0 or a commit SHA"
+    validations:
+      required: true
+  - type: dropdown
+    id: feature
+    attributes:
+      label: Feature
+      options:
+        - Notifications
+        - Autostart
+        - Tray
+        - Demo
+        - Build or tests
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS, version and desktop
+      description: Include the desktop environment and display server.
+      placeholder: "Linux Mint 22, Cinnamon, X11 / Windows 11 / macOS 15"
+    validations:
+      required: true
+  - type: input
+    id: jdk
+    attributes:
+      label: JDK
+      placeholder: "Temurin 17.0.x"
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Demo `--report` output
+      description: Paste the capability table from `java -jar jnativekit-demo-*.jar --report`.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Call Desktop.autostart().enable(...)
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: Include the status, reason and provider you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include the full Result/Capability values and any warning log lines.
+      render: text
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I ran the demo on the OS and desktop named above.
+          required: true
+        - label: I did not include secrets, credentials or personal data.
+          required: true

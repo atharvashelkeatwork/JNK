@@ -1,0 +1,21 @@
+# Build output
+target/
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# JVM crash logs and local logs
+hs_err_pid*
+replay_pid*
+*.log
